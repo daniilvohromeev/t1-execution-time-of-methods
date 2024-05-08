@@ -11,9 +11,12 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ExceptionHandlingAspect {
 
-    @AfterThrowing(pointcut = "@annotation(com.main.t1executiontimeofmethods.annotation.TrackAsyncTime)", throwing = "exception")
-    public void handleAsyncMethodException(JoinPoint joinPoint, Throwable exception) {
-        String methodName = joinPoint.getSignature().getName();
-        log.error("Exception in async method {}: {}", methodName, exception.getMessage());
+    @AfterThrowing(pointcut = "within(com.main.t1executiontimeofmethods.service.*) && " +
+            "execution(* * (..) throws @com.main.t1executiontimeofmethods.annotation.LogTrow *)",
+            throwing = "exception")
+    public void afterThrowing(JoinPoint joinPoint, Exception exception) {
+        log.info("Exception in method: {}", joinPoint.getSignature().toShortString());
+        log.info("with message: {}", exception.getMessage());
     }
+
 }

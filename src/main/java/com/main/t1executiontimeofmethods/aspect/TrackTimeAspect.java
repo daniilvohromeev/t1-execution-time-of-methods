@@ -1,11 +1,13 @@
 package com.main.t1executiontimeofmethods.aspect;
 
-import com.main.t1executiontimeofmethods.services.ExecutionTimeService;
+import com.main.t1executiontimeofmethods.service.ExecutionTimeService;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
 
 @Aspect
 @Component
@@ -27,7 +29,7 @@ public class TrackTimeAspect {
 
         String methodName = joinPoint.getSignature().getName();
         log.info("{} executed in {} ms", methodName, executionTime);
-        executionTimeService.saveExecutionTime(methodName, executionTime);
+        executionTimeService.asyncSaveExecutionTime(methodName, executionTime, LocalDateTime.now());
         return proceed;
     }
 }
