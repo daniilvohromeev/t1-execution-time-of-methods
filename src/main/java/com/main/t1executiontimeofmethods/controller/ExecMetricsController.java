@@ -19,6 +19,6 @@ public class ExecMetricsController{
 
     @GetMapping("/statistic")
     public ResponseStatistics getStatistic(@Valid @RequestBody RequestStatistics request){
-       return executionStatisticsService.getMethodStatistic(request.getName(), request.getTime_start(), request.getTime_end());
+       return executionStatisticsService.getMethodStatistic(request.getName(), request.getTimeStart(), request.getTimeEnd());
     }
 }
