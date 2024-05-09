@@ -1,6 +1,6 @@
 package com.main.t1executiontimeofmethods.aspect;
 
-import com.main.t1executiontimeofmethods.service.ExecutionTimeService;
+import com.main.t1executiontimeofmethods.service.ExecutionTimeSaveService;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -15,9 +15,9 @@ import java.time.LocalDateTime;
 public class TrackTimeAspect {
 
 
-    private final ExecutionTimeService executionTimeService;
+    private final ExecutionTimeSaveService executionTimeService;
 
-    public TrackTimeAspect(ExecutionTimeService executionTimeService) {
+    public TrackTimeAspect(ExecutionTimeSaveService executionTimeService) {
         this.executionTimeService = executionTimeService;
     }
 

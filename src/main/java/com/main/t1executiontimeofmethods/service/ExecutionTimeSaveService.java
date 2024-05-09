@@ -10,11 +10,11 @@ import java.time.LocalDateTime;
 
 @Service
 @Transactional
-public class ExecutionTimeService {
+public class ExecutionTimeSaveService {
 
     private final ExecutionTimeRepository executionTimeRepository;
 
-    public ExecutionTimeService(ExecutionTimeRepository executionTimeRepository) {
+    public ExecutionTimeSaveService(ExecutionTimeRepository executionTimeRepository) {
         this.executionTimeRepository = executionTimeRepository;
     }
 

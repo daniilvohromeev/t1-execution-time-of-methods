@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class LoggingServicesAspect {
 
-    @Pointcut("execution(* com.main.t1executiontimeofmethods.service.*.*(..))")
+    @Pointcut("execution(* com.main.t1executiontimeofmethods.*.*.*(..))")
     private void allMethodsExecutionTimeService() {}
 
     @Before("allMethodsExecutionTimeService()")

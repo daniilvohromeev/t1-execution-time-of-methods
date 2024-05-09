@@ -2,40 +2,70 @@ package com.main.t1executiontimeofmethods.service;
 
 import com.main.t1executiontimeofmethods.exception.DataNotFoundException;
 import com.main.t1executiontimeofmethods.modal.ExecutionTime;
-import com.main.t1executiontimeofmethods.modal.payload.ResponseStatistics;
+import com.main.t1executiontimeofmethods.controller.payload.ResponseStatistics;
 import com.main.t1executiontimeofmethods.repository.ExecutionTimeRepository;
+import com.main.t1executiontimeofmethods.utils.StatisticsCalculator;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
+@Order(1)
 public class ExecutionStatisticsService {
     private final ExecutionTimeRepository repository;
 
-    public ExecutionStatisticsService(ExecutionTimeRepository repository) {
+    private final StatisticsCalculator statisticsCalculator;
+
+    public ExecutionStatisticsService(ExecutionTimeRepository repository, StatisticsCalculator statisticsCalculator) {
         this.repository = repository;
+        this.statisticsCalculator = statisticsCalculator;
     }
 
     public ResponseStatistics getMethodStatistic(String methodName, LocalDateTime start, LocalDateTime end) {
-        List<ExecutionTime> executions = repository.findAllByMethodNameAndTimestampBetween(methodName, start, end)
-                .orElseThrow(() -> new DataNotFoundException("No execution data available for the specified time range and method."));
+        List<ExecutionTime> executions = repository.findAllByMethodNameAndTimestampBetween(methodName, start, end);
+        if (executions.isEmpty()) {
+            throw new DataNotFoundException("No data found for the specified method and time range.");
+        }
+        return statisticsCalculator.calculateStatistics(methodName, executions);
+    }
 
-        LongSummaryStatistics stats = executions.stream()
-                .mapToLong(ExecutionTime::getExecutionTime)
-                .summaryStatistics();
+    public List<ResponseStatistics> getAllMethodStatistics() {
+        List<ExecutionTime> allExecutions = repository.findAll();
+        if (allExecutions.isEmpty()) {
+            throw new DataNotFoundException("No data found");
+        }
+        return allExecutions.stream()
+                .filter(executionTime -> Objects.nonNull(executionTime.getMethodName()))
+                .collect(Collectors.groupingBy(ExecutionTime::getMethodName))
+                .entrySet().stream()
+                .map(entry -> statisticsCalculator.calculateStatistics(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+    }
 
-        long min = stats.getMin();
-        long max = stats.getMax();
-        double average = stats.getAverage();
+    public ResponseStatistics getAggregatedStatistics() {
+        List<ExecutionTime> allExecutions = repository.findAll();
+        if (allExecutions.isEmpty()) {
+            throw new DataNotFoundException("No data found");
+        }
+        return statisticsCalculator.calculateStatistics("All Methods Aggregate", allExecutions);
+    }
 
-        // Вычисление стандартного отклонения
-        double variance = executions.stream()
-                .mapToDouble(execution -> Math.pow(execution.getExecutionTime() - average, 2))
-                .average()
-                .orElse(0.0); // Значение по умолчанию в случае пустого стрима
-        double standardDeviation = Math.sqrt(variance);
-
-        return new ResponseStatistics(methodName, min, max, average, standardDeviation);
+    public Map<LocalDate, List<ResponseStatistics>> getGroupedStatisticsByDate() {
+        List<ExecutionTime> allExecutions = repository.findAll();
+        if (allExecutions.isEmpty()) {
+            throw new DataNotFoundException("No data found");
+        }
+        return allExecutions.stream()
+                .collect(Collectors.groupingBy(execution -> execution.getTimestamp().toLocalDate()))
+                .entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().stream()
+                        .collect(Collectors.groupingBy(ExecutionTime::getMethodName))
+                        .entrySet().stream()
+                        .map(e -> statisticsCalculator.calculateStatistics(e.getKey(), e.getValue()))
+                        .collect(Collectors.toList())));
     }
 }

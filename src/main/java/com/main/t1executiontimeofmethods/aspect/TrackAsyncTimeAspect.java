@@ -1,7 +1,7 @@
 package com.main.t1executiontimeofmethods.aspect;
 
 import com.main.t1executiontimeofmethods.exception.InvalidMethodException;
-import com.main.t1executiontimeofmethods.service.ExecutionTimeService;
+import com.main.t1executiontimeofmethods.service.ExecutionTimeSaveService;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -18,9 +18,9 @@ import java.util.concurrent.CompletableFuture;
 public class TrackAsyncTimeAspect {
 
 
-    private final ExecutionTimeService executionTimeService;
+    private final ExecutionTimeSaveService executionTimeService;
 
-    public TrackAsyncTimeAspect(ExecutionTimeService executionTimeService) {
+    public TrackAsyncTimeAspect(ExecutionTimeSaveService executionTimeService) {
         this.executionTimeService = executionTimeService;
     }
 

@@ -12,10 +12,10 @@ import java.lang.reflect.Method;
 
 @Aspect
 @Component
-public class AsyncValidationAspect {
+public class TrackAsyncTimeValidationAspect {
 
     @Before("@annotation(com.main.t1executiontimeofmethods.annotation.TrackAsyncTime) && execution(* *(..))")
-    public void validateAsyncAnnotation(JoinPoint joinPoint) {
+    public void validateAsyncAnnotation(JoinPoint joinPoint) throws InvalidMethodException {
         Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
 
         if (!method.isAnnotationPresent(Async.class)) {

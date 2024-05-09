@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ExceptionHandlingAspect {
 
-    @AfterThrowing(pointcut = "within(com.main.t1executiontimeofmethods.service.*) && " +
-            "execution(* * (..) throws @com.main.t1executiontimeofmethods.annotation.LogTrow *)",
+    @AfterThrowing(pointcut = "within(com.main.t1executiontimeofmethods.*.*) && " +
+            "execution(* * (..) throws @com.main.t1executiontimeofmethods.annotation.LogThrow *)",
             throwing = "exception")
     public void afterThrowing(JoinPoint joinPoint, Exception exception) {
         log.info("Exception in method: {}", joinPoint.getSignature().toShortString());
